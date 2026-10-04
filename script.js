@@ -2,18 +2,57 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+
+// ============================================================
+// UKURAN LAYAR
+// ============================================================
+
 let width = window.innerWidth;
 let height = window.innerHeight;
 
-canvas.width = width;
-canvas.height = height;
+let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+function resizeCanvas() {
+
+    width = window.innerWidth;
+    height = window.innerHeight;
+
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+    center.x = width / 2;
+    center.y = height / 2;
+
+    createHeart();
+    createWawa();
+
+    if (currentText !== "") {
+        createTextTargets(currentText);
+    }
+}
 
 
 // ============================================================
 // PENGATURAN
 // ============================================================
 
-const PARTICLE_COUNT = 4500;
+const isMobile = window.innerWidth <= 600;
+
+const PARTICLE_COUNT = isMobile ? 2200 : 4500;
 
 const particles = [];
 
@@ -27,7 +66,6 @@ const center = {
 // TIMELINE
 // ============================================================
 
-const TIME_GALAXY = 0;
 const TIME_HEY = 3;
 const TIME_IYAA = 9;
 const TIME_JANGAN = 16;
@@ -72,7 +110,7 @@ for (let i = 0; i < PARTICLE_COUNT; i++) {
 
         size:
             Math.random() *
-            1.8 +
+            (isMobile ? 1.5 : 1.8) +
             0.4,
 
         alpha:
@@ -114,19 +152,34 @@ function createTextTargets(text) {
     );
 
 
-    let fontSize =
-        Math.min(
-            width * 0.11,
-            125
-        );
+    let fontSize;
+
+
+    if (isMobile) {
+
+        fontSize =
+            Math.min(
+                width * 0.15,
+                65
+            );
+
+    } else {
+
+        fontSize =
+            Math.min(
+                width * 0.11,
+                125
+            );
+    }
 
 
     if (text.length > 20) {
 
         fontSize =
             Math.min(
-                width * 0.065,
-                75
+                width *
+                (isMobile ? 0.075 : 0.065),
+                isMobile ? 38 : 75
             );
     }
 
@@ -162,7 +215,8 @@ function createTextTargets(text) {
 
     textTargets = [];
 
-    const gap = 4;
+    const gap =
+        isMobile ? 3 : 4;
 
 
     for (
@@ -438,7 +492,7 @@ function cosmicSwirl(time) {
 
 
 // ============================================================
-// MEMBUAT BENTUK HATI
+// MEMBUAT HATI
 // ============================================================
 
 function createHeart() {
@@ -507,7 +561,7 @@ function createHeart() {
 
 
 // ============================================================
-// MEMBUAT TARGET WAWA
+// MEMBUAT WAWA
 // ============================================================
 
 function createWawa() {
@@ -524,8 +578,9 @@ function createWawa() {
 
     const fontSize =
         Math.min(
-            width * 0.08,
-            85
+            width *
+            (isMobile ? 0.13 : 0.08),
+            isMobile ? 55 : 85
         );
 
 
@@ -560,7 +615,8 @@ function createWawa() {
 
     wawaPoints = [];
 
-    const gap = 3;
+    const gap =
+        isMobile ? 3 : 3;
 
 
     for (
@@ -610,7 +666,8 @@ function drawHeart(progress) {
         Math.min(
             width,
             height
-        ) / 700;
+        ) /
+        (isMobile ? 520 : 700);
 
 
     for (
@@ -671,7 +728,7 @@ function drawHeart(progress) {
 
 
 // ============================================================
-// HATI 3D BERPUTAR
+// HATI 3D
 // ============================================================
 
 function drawRotatingHeart(rotation) {
@@ -680,7 +737,8 @@ function drawRotatingHeart(rotation) {
         Math.min(
             width,
             height
-        ) / 700;
+        ) /
+        (isMobile ? 520 : 700);
 
 
     for (
@@ -765,7 +823,7 @@ function drawRotatingHeart(rotation) {
 
 
 // ============================================================
-// WAWA
+// WAWA DI DALAM HATI
 // ============================================================
 
 function drawWawa(rotation) {
@@ -815,7 +873,7 @@ function drawWawa(rotation) {
         ctx.arc(
             x,
             y,
-            1.3,
+            isMobile ? 1.2 : 1.3,
             0,
             Math.PI * 2
         );
@@ -895,11 +953,7 @@ function animate(time) {
     );
 
 
-    // --------------------------------------------------------
     // 0–3 DETIK
-    // GALAKSI
-    // --------------------------------------------------------
-
     if (
         elapsed < TIME_HEY
     ) {
@@ -908,11 +962,7 @@ function animate(time) {
     }
 
 
-    // --------------------------------------------------------
     // 3–6 DETIK
-    // HEY KAMU
-    // --------------------------------------------------------
-
     else if (
         elapsed < 6
     ) {
@@ -944,11 +994,7 @@ function animate(time) {
     }
 
 
-    // --------------------------------------------------------
     // 6–7 DETIK
-    // HEY KAMU PULSE
-    // --------------------------------------------------------
-
     else if (
         elapsed < 7
     ) {
@@ -999,11 +1045,7 @@ function animate(time) {
     }
 
 
-    // --------------------------------------------------------
     // 7–9 DETIK
-    // EFEK KOSMIK
-    // --------------------------------------------------------
-
     else if (
         elapsed < TIME_IYAA
     ) {
@@ -1012,11 +1054,7 @@ function animate(time) {
     }
 
 
-    // --------------------------------------------------------
     // 9–12 DETIK
-    // IYAA KAMUU MASUK
-    // --------------------------------------------------------
-
     else if (
         elapsed < 12
     ) {
@@ -1048,11 +1086,7 @@ function animate(time) {
     }
 
 
-    // --------------------------------------------------------
     // 12–16 DETIK
-    // IYAA KAMUU TETAP
-    // --------------------------------------------------------
-
     else if (
         elapsed < TIME_JANGAN
     ) {
@@ -1072,11 +1106,7 @@ function animate(time) {
     }
 
 
-    // --------------------------------------------------------
     // 16–20 DETIK
-    // JANGANN BERPALING YAAA
-    // --------------------------------------------------------
-
     else if (
         elapsed < TIME_HEART
     ) {
@@ -1108,11 +1138,7 @@ function animate(time) {
     }
 
 
-    // --------------------------------------------------------
     // 20–23 DETIK
-    // MEMBENTUK HATI
-    // --------------------------------------------------------
-
     else if (
         elapsed < TIME_ROTATE
     ) {
@@ -1133,11 +1159,7 @@ function animate(time) {
     }
 
 
-    // --------------------------------------------------------
     // 23+ DETIK
-    // HATI 3D + WAWA
-    // --------------------------------------------------------
-
     else {
 
         const rotation =
@@ -1161,48 +1183,12 @@ function animate(time) {
 
 
 // ============================================================
-// RESIZE
+// RESIZE HP / LAPTOP
 // ============================================================
 
 window.addEventListener(
     "resize",
-    () => {
-
-        width =
-            window.innerWidth;
-
-        height =
-            window.innerHeight;
-
-
-        canvas.width =
-            width;
-
-        canvas.height =
-            height;
-
-
-        center.x =
-            width / 2;
-
-        center.y =
-            height / 2;
-
-
-        createHeart();
-
-        createWawa();
-
-
-        if (
-            currentText !== ""
-        ) {
-
-            createTextTargets(
-                currentText
-            );
-        }
-    }
+    resizeCanvas
 );
 
 
@@ -1240,6 +1226,8 @@ for (
         0.52;
 }
 
+
+resizeCanvas();
 
 requestAnimationFrame(
     animate
